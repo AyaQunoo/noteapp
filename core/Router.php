@@ -7,33 +7,46 @@ class Router
         $this->routes[] = [
             "uri" => $uri,
             "controller" => $controller,
-            "method" => $method
+            "method" => $method,
+            "middlware" => null
         ];
+        return $this;
     }
     public function get($uri, $controller)
     {
-        $this->add($uri, "GET", $controller);
+        return $this->add($uri, "GET", $controller);
     }
     public function post($uri, $controller)
     {
-        $this->add($uri, "POST", $controller);
+        return $this->add($uri, "POST", $controller);
     }
     public function delete($uri, $controller)
     {
-        $this->add($uri, "DELETE", $controller);
+        return $this->add($uri, "DELETE", $controller);
     }
     public function patch($uri, $controller)
     {
-        $this->add($uri, "PATCH", $controller);
+        return  $this->add($uri, "PATCH", $controller);
     }
     public function put($uri, $controller)
     {
-        $this->add($uri, "PUT", $controller);
+        return $this->add($uri, "PUT", $controller);
+    }
+    public function only($string)
+    {
+        $this->routes[array_key_last($this->routes)]['middlware'] = $string;
+        return $this;
     }
     public function routeTo($uri, $method)
     {
         foreach ($this->routes as $route) {
             if ($route["uri"] === $uri && $route["method"] === strtoupper($method)) {
+                if ($route["middlware"]) {
+                    Middleware::resolve($route["middlware"]);
+                }
+
+
+
 
                 return  require basepath($route["controller"]);
             }
